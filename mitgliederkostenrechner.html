@@ -98,7 +98,9 @@
                     borderColor: 'rgba(75, 192, 192, 1)',
                     backgroundColor: 'rgba(75, 192, 192, 0.2)',
                     borderWidth: 1,
-                    fill: false
+                    fill: false,
+                    pointBackgroundColor: [],
+                    pointBorderColor: []
                 }, {
                     label: 'Hinzugefügte Punkte',
                     data: [],
@@ -144,6 +146,7 @@
                                     `Mitgliedsbeitrag: €${membershipFee.toFixed(2)}`,
                                     `Preis pro Gramm: €${pricePerGram.toFixed(2)}`,
                                     `Summe: €${totalContribution.toFixed(2)}`,
+                                    `Realer preis pro g: €${(totalContribution / amountPerPerson).toFixed(2)}`,
                                     `Rücklagen: €${profit.toFixed(2)}`
                                 ];
                             }
@@ -165,13 +168,27 @@
             membersCountValue.textContent = membersCount;
             amountPerPersonValue.textContent = amountPerPerson;
 
+			
             const data = [];
+            const pointBackgroundColor = [];
+            const pointBorderColor = [];
             for (let pricePerGram = minPricePerGram; pricePerGram <= maxPricePerGram; pricePerGram += 0.1) {
                 const membershipFee = Math.max(1, (expenses - (pricePerGram * totalAmount)) / membersCount);
-                data.push({x: pricePerGram, y: membershipFee});
+				
+                const totalContribution = (pricePerGram * amountPerPerson) + membershipFee;
+                const color = ((totalContribution / amountPerPerson).toFixed(2) > maxPricePerGram) ? 'red' : 'rgba(75, 192, 192, 1)';
+								
+                data.push({
+					x: pricePerGram, 
+					y: membershipFee
+				});
+				pointBackgroundColor.push(color);
+                pointBorderColor.push(color);
             }
-
+		
             priceChart.data.datasets[0].data = data;
+			priceChart.data.datasets[0].pointBackgroundColor = pointBackgroundColor;
+            priceChart.data.datasets[0].pointBorderColor = pointBorderColor;
             priceChart.update();
         }
 
